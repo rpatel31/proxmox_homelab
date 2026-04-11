@@ -1,0 +1,19 @@
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# Ansible
+*.vault_pass
+
+# Secrets
+*.env
+.env*
+secrets*
+
+# OS
+.DS_Store
+Thumbs.db
