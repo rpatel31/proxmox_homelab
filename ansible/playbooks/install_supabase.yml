@@ -1,0 +1,52 @@
+- name: Install Supabase
+  hosts: "{{ target }}"
+  become: true 
+
+  tasks:  
+    - name: Install required packages
+      apt:
+        name:
+          - git 
+          - curl
+        state: present
+        update_cache: true
+
+
+    - name: Clone Supabase repo
+      git:
+        repo: https://github.com/supabase/supabase
+        dest: /opt/supabase/repo
+        depth: 1 
+    
+    - name: Create project directory
+      file:
+        path: /opt/supabase/supabase-project
+        state: directory
+        mode: '0755'
+      
+
+    - name: Copy compose file over to project
+      copy:
+        src: /opt/supabase/repo/docker/
+        dest: /opt/supabase/supabase-project
+        remote_src: true 
+        mode: '0644'
+
+    - name: Copy env file
+      copy:
+        src: /opt/supabase/repo/docker/.env.example
+        dest: /opt/supabase/supabase-project/.env
+        remote_src: true
+    
+    - name: Pull latest images
+      command:
+        chdir: /opt/supabase/supabase-project
+        cmd: docker compose pull
+
+    - name: Start Supabase 
+      command:
+        chdir: /opt/supabase/supabase-project
+        cmd: docker compose up -d
+      register: supabase_up
+      changed_when: supabase_up.rc == 0
+      

@@ -1,0 +1,16 @@
+all: 
+  children:
+    vms:
+      hosts:
+        docker-host:
+          ansible_host: 192.168.1.100
+          ansible_user: vm_docker
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+    lxc:
+      hosts:
+        adguard:
+          ansible_host: 192.168.1.101
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+    

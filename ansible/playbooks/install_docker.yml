@@ -1,0 +1,59 @@
+- name: Install Docker
+  hosts: "{{ target }}"
+  become: true 
+
+
+
+
+  tasks:
+    - name: Update cache and upgrade
+      apt:
+        update_cache: true
+        upgrade: yes
+      
+    - name: set up system packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - git
+        state: latest
+        update_cache: true
+        
+
+    - name: Add Docker GPG key 
+      apt_key: 
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repo
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present 
+
+    - name: install docker ce 
+      apt:
+        name: 
+          - docker-ce
+          - docker-ce-cli 
+          - containerd.io 
+          - docker-buildx-plugin 
+          - docker-compose-plugin
+        state: latest 
+        update_cache: true
+
+    - name: Start Docker
+      systemd:
+        name: docker
+        enabled: true
+        state: started  
+
+    - name: check docker status 
+      command: 
+        cmd: systemctl status docker
+      register: status_docker 
+
+    - name: show docker status
+      debug:
+        msg: "{{ status_docker.stdout }} "

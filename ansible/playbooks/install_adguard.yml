@@ -1,0 +1,48 @@
+- name: Install AdGaurd Home
+  hosts: adguard
+  become: true
+
+  tasks:
+    - name: Update cache and upgrade
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+
+    - name: Install Packages (curl,wget,tar)
+      ansible.builtin.apt:
+        name: 
+          - curl
+          - wget
+          - tar
+        state: present
+    
+    - name: Download AdGaurd Home
+      ansible.builtin.get_url:
+        url: "https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz"
+        dest: /tmp/AdGuardHome.tar.gz
+        mode: 0755
+    
+    - name: Create AdGuard Home Dir
+      ansible.builtin.file:
+        path: /opt/adguardhome
+        state: directory
+        mode: '0755'
+        
+    - name: Extract Adguard Home
+      ansible.builtin.unarchive:
+        src: /tmp/AdGuardHome.tar.gz
+        dest: /opt/adguardhome
+        remote_src: true
+        extra_opts: [--strip-components=2]
+    
+    - name: install AdGuard Home as a service per doc # https://adguard-dns.io/kb/adguard-home/getting-started/
+      ansible.builtin.command:
+        cmd: /opt/adguardhome/AdGuardHome -s install 
+    
+    - name: Start AdGuard service
+      ansible.builtin.systemd:
+        name: AdGuardHome
+        enabled: true
+        state: started
+
+

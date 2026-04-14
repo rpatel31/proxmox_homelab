@@ -1,0 +1,38 @@
+- name: Install, configure and start TailScale
+  hosts: "{{ target }}"
+  become: true
+
+  tasks:
+  - name: Update cache and upgrade
+    ansible.builtin.apt:
+      update_cache: true
+      upgrade: yes
+
+  - name: Download TailScale Install Script
+    ansible.builtin.get_url:
+      url: https://tailscale.com/install.sh
+      dest: /tmp/install_tailscale.sh
+      mode: '0755'
+
+  - name: Execute install script
+    ansible.builtin.command:
+      cmd: /tmp/install_tailscale.sh
+
+  - name: Start TailScale service
+    ansible.builtin.systemd:
+      name: tailscaled
+      enabled: true
+      state: started
+
+  - name: Log in to tailscale network 
+    ansible.builtin.command:
+      cmd: "tailscale up --authkey={{ tailscale_auth_key }}"
+
+  - name: Get TailScale Status 
+    ansible.builtin.command:
+      cmd: tailscale Status
+    register: status_ts
+
+  - name: show tailscale status_ts
+    ansible.builtin.debug:
+      msg: "{{status_ts.stdout}}"
