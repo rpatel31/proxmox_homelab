@@ -19,7 +19,7 @@
           - curl
           - git
         state: latest
-        update_cache: true
+        update_cache: true 
         
 
     - name: Add Docker GPG key 

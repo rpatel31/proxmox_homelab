@@ -50,3 +50,4 @@ variable vm_docker_host_ip{
     type = string
     description = "IP for docker VM"
 }
+
